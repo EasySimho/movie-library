@@ -49,6 +49,7 @@ const searchMovieDetails = async (title) => {
     return { imageUrl: null, releaseYear: 'N/A' };
 };
 
+app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
