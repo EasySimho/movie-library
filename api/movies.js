@@ -54,62 +54,82 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/', (req, res) => {
-    const movies = readMovies();
-    res.render(path.join(__dirname, '../views/index.ejs'), { movies });
+    try {
+        const movies = readMovies();
+        res.render(path.join(__dirname, '../views/index.ejs'), { movies });
+    } catch (error) {
+        console.error('Error rendering index page:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 app.post('/api/movies', async (req, res) => {
-    const { title } = req.body;
-    if (!title) {
-        return res.status(400).send('Title is required');
+    try {
+        const { title } = req.body;
+        if (!title) {
+            return res.status(400).send('Title is required');
+        }
+
+        const capitalizedTitle = capitalizeTitle(title);
+        const { imageUrl, releaseYear } = await searchMovieDetails(capitalizedTitle);
+
+        const movies = readMovies();
+        if (movies.some(movie => movie.title.toLowerCase() === capitalizedTitle.toLowerCase())) {
+            return res.status(409).send('Movie already exists');
+        }
+
+        const newMovie = {
+            title: capitalizedTitle,
+            year: releaseYear,
+            image: imageUrl,
+            watched: false
+        };
+
+        movies.push(newMovie);
+        writeMovies(movies);
+        res.status(201).send(newMovie);
+    } catch (error) {
+        console.error('Error adding movie:', error);
+        res.status(500).send('Internal Server Error');
     }
-
-    const capitalizedTitle = capitalizeTitle(title);
-    const { imageUrl, releaseYear } = await searchMovieDetails(capitalizedTitle);
-
-    const movies = readMovies();
-    if (movies.some(movie => movie.title.toLowerCase() === capitalizedTitle.toLowerCase())) {
-        return res.status(409).send('Movie already exists');
-    }
-
-    const newMovie = {
-        title: capitalizedTitle,
-        year: releaseYear,
-        image: imageUrl,
-        watched: false
-    };
-
-    movies.push(newMovie);
-    writeMovies(movies);
-    res.status(201).send(newMovie);
 });
 
 app.post('/api/movies/:title/watched', (req, res) => {
-    const { title } = req.params;
-    const movies = readMovies();
-    const movieIndex = movies.findIndex(movie => movie.title.toLowerCase() === title.toLowerCase());
+    try {
+        const { title } = req.params;
+        const movies = readMovies();
+        const movieIndex = movies.findIndex(movie => movie.title.toLowerCase() === title.toLowerCase());
 
-    if (movieIndex === -1) {
-        return res.status(404).send('Movie not found');
+        if (movieIndex === -1) {
+            return res.status(404).send('Movie not found');
+        }
+
+        movies[movieIndex].watched = !movies[movieIndex].watched;
+        writeMovies(movies);
+        res.status(200).send(movies[movieIndex]);
+    } catch (error) {
+        console.error(`Error updating watched status for ${title}:`, error);
+        res.status(500).send('Internal Server Error');
     }
-
-    movies[movieIndex].watched = !movies[movieIndex].watched;
-    writeMovies(movies);
-    res.status(200).send(movies[movieIndex]);
 });
 
 app.delete('/api/movies/:title', (req, res) => {
-    const { title } = req.params;
-    const movies = readMovies();
-    const movieIndex = movies.findIndex(movie => movie.title.toLowerCase() === title.toLowerCase());
+    try {
+        const { title } = req.params;
+        const movies = readMovies();
+        const movieIndex = movies.findIndex(movie => movie.title.toLowerCase() === title.toLowerCase());
 
-    if (movieIndex === -1) {
-        return res.status(404).send('Movie not found');
+        if (movieIndex === -1) {
+            return res.status(404).send('Movie not found');
+        }
+
+        const deletedMovie = movies.splice(movieIndex, 1);
+        writeMovies(movies);
+        res.status(200).send(deletedMovie);
+    } catch (error) {
+        console.error(`Error deleting movie ${title}:`, error);
+        res.status(500).send('Internal Server Error');
     }
-
-    const deletedMovie = movies.splice(movieIndex, 1);
-    writeMovies(movies);
-    res.status(200).send(deletedMovie);
 });
 
 module.exports = app;
