@@ -3,7 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const { addImagesAndYearsToMovies, searchMovieImage, searchMovieYear } = require('./tmdbAPI');
-require('dotenv').config();
+require('dotenv').config({ path: '.env.vercel' });;
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -81,6 +81,4 @@ app.delete('/api/movies/:title', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+exports.app = app;
