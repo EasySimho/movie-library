@@ -8,26 +8,26 @@ require('dotenv').config();
 const app = express();
 const moviesFile = path.join(__dirname, '../data/movies.json');
 
-// Read the TMDB API key from the environment variables
+// Leggi la chiave API di TMDB dalle variabili di ambiente
 const tmdbApiKey = process.env.TMDB_API_KEY;
 
-// Helper function to read movies from the JSON file
+// Funzione helper per leggere i film dal file JSON
 const readMovies = () => {
     const moviesData = fs.readFileSync(moviesFile);
     return JSON.parse(moviesData);
 };
 
-// Helper function to write movies to the JSON file
+// Funzione helper per scrivere i film nel file JSON
 const writeMovies = (movies) => {
     fs.writeFileSync(moviesFile, JSON.stringify(movies, null, 2));
 };
 
-// Function to capitalize the first letter of each word in a string
+// Funzione per capitalizzare la prima lettera di ogni parola in una stringa
 const capitalizeTitle = (title) => {
     return title.replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
-// Function to search for movie image and year using TMDB API
+// Funzione per cercare immagine e anno del film usando l'API TMDB
 const searchMovieDetails = async (title) => {
     try {
         const response = await axios.get(`https://api.themoviedb.org/3/search/movie`, {
@@ -49,7 +49,6 @@ const searchMovieDetails = async (title) => {
     return { imageUrl: null, releaseYear: 'N/A' };
 };
 
-app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
