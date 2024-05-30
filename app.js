@@ -82,4 +82,6 @@ app.delete('/api/movies/:title', async (req, res) => {
     }
 });
 
-exports.app = app;
+app.listen(port, () => { 
+    console.log(`Server is running on port ${PORT}`); 
+  });
