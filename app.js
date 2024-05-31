@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises;
+require('dotenv').config();
+const axios = require('axios');
+const tmdbApiKey = process.env.TMDB_API_KEY;
 const { addImagesAndYearsToMovies, searchMovieImage, searchMovieYear } = require('./tmdbAPI');
 require('dotenv').config({ path: '.env.vercel' });;
 const app = express();
@@ -38,10 +41,17 @@ app.get('/', async (req, res) => {
 app.post('/api/movies', async (req, res) => {
     const { title, year } = req.body;
     try {
+        let movies = await loadMovies();
+        // Controllo se il film esiste già
+        const movieExists = movies.some(movie => movie.title.toLowerCase() === title.toLowerCase());
+        if (movieExists) {
+            return res.status(400).json({ error: 'Movie already exists' });
+        }
+
         const MovieYear = await searchMovieYear(title);
         const movieImage = await searchMovieImage(title);
         const newMovie = { title, year: MovieYear, image: movieImage || '/images/default.jpg', watched: false };
-        let movies = await loadMovies();
+
         movies.push(newMovie);
         await saveMovies(movies);
         res.status(200).send();
@@ -69,6 +79,26 @@ app.post('/api/movies/:title/watched', async (req, res) => {
     }
 });
 
+app.get('/api/search', async (req, res) => {
+    const { query } = req.query;
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/search/movie`, {
+            params: {
+                api_key: process.env.TMDB_API_KEY,
+                query: query
+            }
+        });
+        const titles = response.data.results.map(movie => movie.title);
+        res.json(titles);
+    } catch (error) {
+        console.error('Error fetching movie titles:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
+
 app.delete('/api/movies/:title', async (req, res) => {
     const { title } = req.params;
     try {
@@ -82,4 +112,6 @@ app.delete('/api/movies/:title', async (req, res) => {
     }
 });
 
-exports.app = app;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+}); 
