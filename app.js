@@ -112,12 +112,6 @@ app.delete('/api/movies/:title', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 }); 
-=======
-app.listen(PORT, () => { 
-    console.log(`Server is running on port ${PORT}`); 
-  });
->>>>>>> b7fce56402d06a0b30c98096caa22e6430f4791a
