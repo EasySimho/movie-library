@@ -6,6 +6,12 @@
     "watched": false
   },
   {
+    "title": "HAIKYU!! The Dumpster Battle",
+    "year": 2024,
+    "image": "https://image.tmdb.org/t/p/w500/ntRU0OA4etGGiMMmH1Yw0bnaMdW.jpg",
+    "watched": false
+  },
+  {
     "title": "Sing",
     "year": 2016,
     "image": "https://image.tmdb.org/t/p/w500/zZTlF2eVVUkbdmccd3bNUU9T9sD.jpg",
@@ -15,6 +21,18 @@
     "title": "up",
     "year": 2009,
     "image": "https://image.tmdb.org/t/p/w500/vpbaStTMt8qqXaEgnOR2EE4DNJk.jpg",
+    "watched": false
+  },
+  {
+    "title": "Paranormal Activity",
+    "year": 2007,
+    "image": "https://image.tmdb.org/t/p/w500/tmclkEpjeo4Zu564gf3KrwIOuKw.jpg",
+    "watched": false
+  },
+  {
+    "title": "Ghost in the Shell: The New Movie",
+    "year": 2015,
+    "image": "https://image.tmdb.org/t/p/w500/d6TaDCmvX0D2fdeNIxWAR69bhiH.jpg",
     "watched": false
   }
 ]
